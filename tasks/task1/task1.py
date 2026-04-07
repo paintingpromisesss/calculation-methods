@@ -1,78 +1,89 @@
 from copy import deepcopy
 
+from utils import print_matrix, EPS, mat_vec_mult, mat_mult
 
-def lu_decomposition(a):
-    n = len(a)
-    lu = deepcopy(a)
-    p = list(range(n))
-    swap_count = 0
-
-    for k in range(n):
-        pivot_row = max(range(k, n), key=lambda i: abs(lu[i][k]))
-        if abs(lu[pivot_row][k]) < 1e-12:
-            raise ValueError("Матрица вырождена")
-
-        if pivot_row != k:
-            lu[k], lu[pivot_row] = lu[pivot_row], lu[k]
-            p[k], p[pivot_row] = p[pivot_row], p[k]
-            swap_count += 1
-
-        for i in range(k + 1, n):
-            lu[i][k] /= lu[k][k]
-            for j in range(k + 1, n):
-                lu[i][j] -= lu[i][k] * lu[k][j]
-
-    return lu, p, swap_count
-
-
-def solve_lu(lu, p, b):
-    n = len(lu)
-    pb = [b[p[i]] for i in range(n)]
-
-    y = [0.0] * n
-    for i in range(n):
-        y[i] = pb[i] - sum(lu[i][j] * y[j] for j in range(i))
-
-    x = [0.0] * n
-    for i in range(n - 1, -1, -1):
-        x[i] = (y[i] - sum(lu[i][j] * x[j] for j in range(i + 1, n))) / lu[i][i]
-
-    return x
-
-
-def determinant(lu, swap_count):
+def determinant_from_lu(U, swap_count):
     det = 1.0
-    for i in range(len(lu)):
-        det *= lu[i][i]
-    return -det if swap_count % 2 else det
+    n = len(U)
+    for i in range(n):
+        det *= U[i][i]
+    if swap_count % 2 == 1:
+        det = -det
+    return det
 
-
-def inverse_matrix(lu, p):
-    n = len(lu)
+def inverse_from_lu(P, L, U):
+    n = len(U)
     inv = [[0.0] * n for _ in range(n)]
-
     for col in range(n):
         e = [0.0] * n
         e[col] = 1.0
-        x = solve_lu(lu, p, e)
+
+        Pb = mat_vec_mult(P, e)
+        y = forward_solve(L, Pb)
+        x = backward_solve(U, y)
+
         for row in range(n):
             inv[row][col] = x[row]
-
+    
     return inv
 
+def get_lu(a):
+    n = len(a)
+    U = deepcopy(a)
+    P = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+    L = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+    swap_count = 0
 
-def print_vector(name, vector):
-    print(name)
-    for i, value in enumerate(vector, start=1):
-        print(f"x{i} = {value:.10f}")
-    print()
+    for i in range(n):
+        max_elem_row = max(range(i, n), key=lambda r: abs(U[r][i]))
+
+        if abs(U[max_elem_row][i]) < EPS:
+            raise ValueError("Матрица вырождена или почти вырождена")
+
+        if max_elem_row != i:
+            U[i], U[max_elem_row] = U[max_elem_row], U[i]
+            P[i], P[max_elem_row] = P[max_elem_row], P[i]
+            swap_count += 1
+
+            for k in range(i):
+                L[i][k], L[max_elem_row][k] = L[max_elem_row][k], L[i][k]
+
+        for j in range(i + 1, n):
+            factor = U[j][i] / U[i][i]
+            L[j][i] = factor
+
+            for k in range(i, n):
+                U[j][k] -= factor * U[i][k]
+
+    return P, L, U, swap_count
 
 
-def print_matrix(name, matrix):
-    print(name)
-    for row in matrix:
-        print(" ".join(f"{value: .10f}" for value in row))
-    print()
+def forward_solve(L, b):
+    n = len(L)
+    y = [0.0] * n
+    
+    for i in range(n):
+        if abs(L[i][i]) < EPS:
+            raise ValueError(f"Нулевой или почти нулевой элемент L[{i}][{i}]")
+        y[i] = b[i]
+        for j in range(i):
+            y[i] -= L[i][j] * y[j]
+        y[i] /= L[i][i]
+
+    return y
+
+
+def backward_solve(U, y):
+    n = len(U)
+    x = [0.0] * n
+    for i in range(n - 1, -1, -1):
+        if abs(U[i][i]) < EPS:
+            raise ValueError(f"Нулевой или почти нулевой элемент U[{i}][{i}]")
+        x[i] = y[i]
+        for j in range(i + 1, n):
+            x[i] -= U[i][j] * x[j]
+        x[i] /= U[i][i]
+    return x
 
 
 def main():
@@ -84,15 +95,28 @@ def main():
     ]
     b = [57.0, 24.0, 28.0, 12.0]
 
-    lu, p, swap_count = lu_decomposition(a)
-    x = solve_lu(lu, p, b)
-    det = determinant(lu, swap_count)
-    inv = inverse_matrix(lu, p)
+    P, L, U, swap_count = get_lu(a)
+    print_matrix(U, "Матрица U")
+    print_matrix(L, "Матрица L")
+    print_matrix(P, "Матрица P")
 
-    print("Задание 1.1, вариант 23\n")
-    print_vector("Решение системы:", x)
-    print(f"Определитель: {det:.10f}\n")
-    print_matrix("Обратная матрица:", inv)
+    Pb = mat_vec_mult(P, b)
+    y = forward_solve(L, Pb)
+    x = backward_solve(U, y)
+    print("Pb =", [f"{v:.6f}" for v in Pb])
+    print("y  =", [f"{v:.6f}" for v in y])
+    print("x  =", [f"{v:.6f}" for v in x])
+    print()
+
+    det_a = determinant_from_lu(U, swap_count)
+    print(f"det(A) = {det_a:.6f}")
+    print()
+    A_inv = inverse_from_lu(P, L, U)
+    print_matrix(A_inv, "A^(-1)")
+
+    print()
+    check = mat_mult(a, A_inv)
+    print_matrix(check, "A * A^(-1)")
 
 
 if __name__ == "__main__":
