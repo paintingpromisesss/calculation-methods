@@ -115,7 +115,7 @@ def main():
     print_matrix(A_inv, "A^(-1)")
 
     print()
-    check = mat_mult(a, A_inv)
+    check = mat_mat_mult(a, A_inv)
     print_matrix(check, "A * A^(-1)")
 
 
