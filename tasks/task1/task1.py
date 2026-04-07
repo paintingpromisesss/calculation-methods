@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from utils import print_matrix, EPS, mat_vec_mult, mat_mult
+from utils import print_matrix, EPS, mat_vec_mult, mat_mat_mult
 
 def determinant_from_lu(U, swap_count):
     det = 1.0
