@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from utils import print_matrix, EPS, mat_vec_mult, mat_mult
+from utils import print_matrix, EPS, mat_vec_mult, mat_mat_mult
 
 
 def determinant_from_lu(U, swap_count):
@@ -118,7 +118,7 @@ def main():
     print_matrix(A_inv, "A^(-1)")
 
     print()
-    check = mat_mult(a, A_inv)
+    check = mat_mat_mult(a, A_inv)
     print_matrix(check, "A * A^(-1)")
 
 
