@@ -1,4 +1,3 @@
-
 from math import sqrt
 EPS=1e-12
 

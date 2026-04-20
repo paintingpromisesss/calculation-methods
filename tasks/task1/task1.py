@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from utils import print_matrix, EPS, mat_vec_mult, mat_mult
 
+
 def determinant_from_lu(U, swap_count):
     det = 1.0
     n = len(U)
@@ -10,6 +11,7 @@ def determinant_from_lu(U, swap_count):
     if swap_count % 2 == 1:
         det = -det
     return det
+
 
 def inverse_from_lu(P, L, U):
     n = len(U)
@@ -24,8 +26,9 @@ def inverse_from_lu(P, L, U):
 
         for row in range(n):
             inv[row][col] = x[row]
-    
+
     return inv
+
 
 def get_lu(a):
     n = len(a)
@@ -61,7 +64,7 @@ def get_lu(a):
 def forward_solve(L, b):
     n = len(L)
     y = [0.0] * n
-    
+
     for i in range(n):
         if abs(L[i][i]) < EPS:
             raise ValueError(f"Нулевой или почти нулевой элемент L[{i}][{i}]")

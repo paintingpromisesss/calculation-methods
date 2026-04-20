@@ -1,5 +1,5 @@
-
 from utils import get_matrix_norm_c, get_vector_norm_c, print_vector, check_solution, fix_zero_diagonal, prepare_system, split_alpha
+
 def zeidel_error_estimate(alpha, c_matrix, x_new, x_old):
     alpha_norm = get_matrix_norm_c(alpha)
 

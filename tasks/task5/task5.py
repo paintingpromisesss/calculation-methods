@@ -1,4 +1,3 @@
-from math import sqrt
 from utils import get_hh_matrix, vector_norm, matrix_multiply, max_val_below_diagonal, print_matrix, print_vector, check_solution
 
 

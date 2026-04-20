@@ -1,5 +1,6 @@
 EPS = 1e-12
 
+
 def print_vector(name, vector, prefix):
     print(name)
     for i, value in enumerate(vector, start=1):
@@ -24,4 +25,3 @@ def check_solution(a, b, c, d, x):
             f"правая часть = {d[i]:.10f}, "
             f"{'OK' if ok else 'FAIL'}"
         )
-

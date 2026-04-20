@@ -1,4 +1,4 @@
-from math import atan2, cos, pi, sin, sqrt
+from math import atan2, cos, pi, sin
 from copy import deepcopy
 from utils import print_matrix, print_vector, get_column, get_vector_norm_c, mat_vec_mult, check_symmetric, max_off_diagonal_element, off_diagonal_norm
 

@@ -1,4 +1,6 @@
-EPS=1e-12
+EPS = 1e-12
+
+
 def print_matrix(matrix, name="Matrix", precision=6):
     cleaned = []
     for row in matrix:
@@ -24,9 +26,11 @@ def print_matrix(matrix, name="Matrix", precision=6):
         print("  ".join(f"{item:>{width}}" for item in row), end=" ")
         print("]")
 
+
 def mat_vec_mult(matrix, vector):
     n = len(matrix)
     return [sum(matrix[i][j] * vector[j] for j in range(n)) for i in range(n)]
+
 
 def mat_mat_mult(A, B):
     n = len(A)
