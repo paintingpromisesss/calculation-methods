@@ -1,46 +1,24 @@
+from math import log
 EPS = 1e-12
 
 
-def print_matrix(matrix, name="Matrix", precision=6):
-    cleaned = []
-    for row in matrix:
-        cleaned_row = []
-        for x in row:
-            if abs(x) < EPS:
-                x = 0.0
-            cleaned_row.append(x)
-        cleaned.append(cleaned_row)
+def phi(x):
+    if x <= -2:
+        raise ValueError("x должен быть больше -2")
+    value = log(x+2) + 0.5
 
-    formatted = []
-    for row in cleaned:
-        formatted_row = []
-        for x in row:
-            formatted_row.append(f"{x:.{precision}f}")
-        formatted.append(formatted_row)
+    if value < 0:
+        raise ValueError("phi(x) должен быть неотрицательным")
 
-    width = max(len(item) for row in formatted for item in row)
-
-    print(f"{name}:")
-    for row in formatted:
-        print("[", end=" ")
-        print("  ".join(f"{item:>{width}}" for item in row), end=" ")
-        print("]")
+    return value**0.25
 
 
-def mat_vec_mult(matrix, vector):
-    n = len(matrix)
-    return [sum(matrix[i][j] * vector[j] for j in range(n)) for i in range(n)]
+def f(x):
+    if x <= -2:
+        raise ValueError("x должен быть больше -2")
+    return log(x+2) - x**4 + 0.5
 
-
-def mat_mat_mult(A, B):
-    n = len(A)
-    m = len(B[0])
-    p = len(B)
-
-    result = [[0.0] * m for _ in range(n)]
-
-    for i in range(n):
-        for j in range(m):
-            result[i][j] = sum(A[i][k] * B[k][j] for k in range(p))
-
-    return result
+def df(x):
+    if x <= -2:
+        raise ValueError("x должен быть больше -2")
+    return 1/(x+2) - 4*x**3

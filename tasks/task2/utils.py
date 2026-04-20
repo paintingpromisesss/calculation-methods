@@ -1,27 +1,38 @@
+from math import atan, sqrt, tan, cos
 EPS = 1e-12
 
 
-def print_vector(name, vector, prefix):
-    print(name)
-    for i, value in enumerate(vector, start=1):
-        print(f"{prefix}{i} = {value:.10f}")
-    print()
+def phi1(x1, x2):
+    return atan(x2)
 
 
-def check_solution(a, b, c, d, x):
-    n = len(x)
-    print("Проверка:")
-    for i in range(n):
-        left = b[i] * x[i]
-        if i > 0:
-            left += a[i] * x[i - 1]
-        if i < n - 1:
-            left += c[i] * x[i + 1]
+def phi2(x1, x2):
+    value = 1 + x1 - 2 * x1**2
+    if value < 0:
+        raise ValueError(
+            "Значение под корнем отрицательное, метод простых итераций не применим")
 
-        ok = abs(left - d[i]) < EPS
-        print(
-            f"Уравнение {i+1}: "
-            f"левая часть = {left:.10f}, "
-            f"правая часть = {d[i]:.10f}, "
-            f"{'OK' if ok else 'FAIL'}"
-        )
+    return sqrt(value)
+
+
+def f1(x1, x2):
+    return 2 * x1**2 - x1 + x2**2 - 1
+
+
+def f2(x1, x2):
+    return x2 - tan(x1)
+
+
+def df1_dx1(x1, x2):
+    return 4 * x1 - 1
+
+
+def df1_dx2(x1, x2):
+    return 2 * x2
+
+
+def df2_dx1(x1, x2):
+    return - (1 / cos(x1)**2)
+
+def df2_dx2(x1, x2):
+    return 1
