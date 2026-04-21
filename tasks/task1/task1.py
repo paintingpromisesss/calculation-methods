@@ -115,9 +115,7 @@ def main():
     print(f"det(A) = {det_a:.6f}")
     print()
     A_inv = inverse_from_lu(P, L, U)
-    print_matrix(A_inv, "A^(-1)")
 
-    print()
     check = mat_mat_mult(a, A_inv)
     print_matrix(check, "A * A^(-1)")
 
