@@ -63,7 +63,7 @@ def jacobi_method(matrix, eps=1e-6, max_iterations=10000):
 def check_solution(original_matrix, values, vectors, eps=1e-6):
     n = len(original_matrix)
 
-    print("Проверка решения:")
+    print("Проверка A * x = λ * x:")
     for idx in range(n):
         eigenvector = get_column(vectors, idx)
         left = mat_vec_mult(original_matrix, eigenvector)
@@ -74,6 +74,9 @@ def check_solution(original_matrix, values, vectors, eps=1e-6):
         status = "OK" if residual_norm < eps else "FAIL"
         print(f"Собственное значение λ{idx + 1} = {values[idx]:.6f}")
         print(f"Собственный вектор x{idx + 1} = {[round(x, 6) for x in eigenvector]}")
+        print(f"A * x{idx + 1} = {[round(x, 6) for x in left]}")
+        print(f"λ{idx + 1} * x{idx + 1} = {[round(x, 6) for x in right]}")
+        print(f"||A * x{idx + 1} - λ{idx + 1} * x{idx + 1}|| = {residual_norm:.12f} -> {status}")
         print()
 
     print("Проверка ортогональности собственных векторов:")
