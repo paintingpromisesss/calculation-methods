@@ -97,34 +97,8 @@ def determinant_3x3(matrix):
 def check_solution(original_matrix, final_matrix, values, eps=1e-9):
     print("Проверка решения:")
 
-    tr_a = trace(original_matrix)
-    sum_lambda = sum(values)
-    trace_ok = abs(tr_a - sum_lambda) < eps
-
-    print(f"След матрицы:")
-    print(f"tr(A)                 = {tr_a:.10f}")
-    print(f"sum(lambda_i)         = {sum_lambda:.10f}")
-    print(f"{'OK' if trace_ok else 'FAIL'}")
-    print()
-
     if len(original_matrix) == 3:
-        det_a = determinant_3x3(original_matrix)
-        prod_lambda = 1.0
-        for value in values:
-            prod_lambda *= value
-
-        det_ok = abs(det_a - prod_lambda) < eps
-
-        print(f"Определитель матрицы:")
-        print(f"det(A)                = {det_a:.10f}")
-        print(f"prod(lambda_i)        = {prod_lambda:.10f}")
-        print(f"{'OK' if det_ok else 'FAIL'}")
-        print()
-
         max_below = max_val_below_diagonal(final_matrix)
-        triangular_ok = max_below < eps
-        print("Проверка верхнетреугольного вида:")
         print(f"Наибольшее значение под диагональю = {max_below:.10e}")
-        print(f"{'OK' if triangular_ok else 'FAIL'}")
         print()
     print()

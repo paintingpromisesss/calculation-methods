@@ -20,8 +20,8 @@ def inverse_from_lu(P, L, U):
         e = [0.0] * n
         e[col] = 1.0
 
-        Pb = mat_vec_mult(P, e)
-        y = forward_solve(L, Pb)
+        Pe = mat_vec_mult(P, e)
+        y = forward_solve(L, Pe)
         x = backward_solve(U, y)
 
         for row in range(n):
@@ -103,6 +103,8 @@ def main():
     print_matrix(L, "Матрица L")
     print_matrix(P, "Матрица P")
 
+    check_LU = mat_mat_mult(L, U)
+    print_matrix(check_LU, "Проверка L * U")
     Pb = mat_vec_mult(P, b)
     y = forward_solve(L, Pb)
     x = backward_solve(U, y)
