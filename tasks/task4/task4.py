@@ -4,7 +4,7 @@ from utils import print_matrix, print_vector, get_column, get_vector_norm_c, mat
 
 def jacobi_rotation_step(matrix, vectors):
     n = len(matrix)
-    i, j, _ = max_off_diagonal_element(matrix)
+    i, j = max_off_diagonal_element(matrix)
 
     if abs(matrix[i][i] - matrix[j][j]) < 1e-12:
         angle = pi / 4

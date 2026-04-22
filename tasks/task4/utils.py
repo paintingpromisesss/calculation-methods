@@ -64,7 +64,7 @@ def max_off_diagonal_element(matrix):
                 max_value = abs(matrix[i][j])
                 max_i, max_j = i, j
 
-    return max_i, max_j, max_value
+    return max_i, max_j
 
 def off_diagonal_norm(matrix):
     n = len(matrix)
