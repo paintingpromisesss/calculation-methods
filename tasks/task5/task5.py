@@ -1,4 +1,4 @@
-from utils import get_hh_matrix, vector_norm, matrix_multiply, max_val_below_diagonal, print_matrix, print_vector, check_solution
+from utils import get_hh_matrix, vector_norm, matrix_multiply, print_matrix, print_vector, check_solution, eigenvalues_from_quasi_triangular, is_quasi_triangular
 
 
 def qr_decomposition(matrix):
@@ -13,12 +13,10 @@ def qr_decomposition(matrix):
         if x_norm == 0:
             continue
 
-        sign = 1.0 if x[0] >= 0 else -1.0
+        phase = x[0] / abs(x[0]) if abs(x[0]) > 1e-12 else 1.0
 
-        e1 = [0.0] * len(x)
-        e1[0] = 1.0
-
-        u = [x[i] + sign * x_norm * e1[i] for i in range(len(x))]
+        u = x[:]
+        u[0] += phase * x_norm
 
         v = u[:]
 
@@ -37,26 +35,27 @@ def qr_decomposition(matrix):
 
 def qr_algorithm(matrix, eps, max_iterations=10000):
     a_k = [row[:] for row in matrix]
-    n = len(a_k)
 
     for iteration in range(max_iterations):
         q, r = qr_decomposition(a_k)
         a_k = matrix_multiply(r, q)
 
-        if max_val_below_diagonal(a_k) < eps:
-            values = [a_k[i][i] for i in range(n)]
-            return values, a_k, iteration+1
-
-    value = [a_k[i][i] for i in range(n)]
-    return value, a_k, max_iterations
+        if is_quasi_triangular(a_k, eps):
+            values = eigenvalues_from_quasi_triangular(a_k, eps)
+            return values, a_k, iteration + 1
+    
+    values = eigenvalues_from_quasi_triangular(a_k, eps)
+    return values, a_k, max_iterations
 
 
 def main():
     a = [
-        [1.0, 5.0, -6.0],
-        [9.0, -7.0, -9.0],
-        [6.0, -1.0, -9.0]
-    ]
+    [2.0,  7.0, -3.0,  1.0,  4.0],
+    [1.0,  5.0,  2.0, -6.0,  0.0],
+    [0.0, -2.0,  3.0,  5.0, -1.0],
+    [4.0,  0.0,  1.0, -1.0,  2.0],
+    [3.0, -1.0,  0.0,  2.0,  1.0],
+]
     eps = 1e-12
 
     values, final_matrix, iterations = qr_algorithm(a, eps)

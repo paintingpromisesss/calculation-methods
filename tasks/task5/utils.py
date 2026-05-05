@@ -1,21 +1,25 @@
-from math import sqrt
+from cmath import sqrt
+from math import prod
 EPS=1e-12
 
-def get_hh_matrix(v):
+def get_hh_matrix(v, eps=EPS):
     n = len(v)
-    vv = sum(x * x for x in v)
+    vv = sum(abs(x) ** 2 for x in v)
 
-    h = [[0.0] * n for _ in range(n)]
+    if vv < eps:
+        return [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+
+    h = [[0j] * n for _ in range(n)]
+
     for i in range(n):
         for j in range(n):
-            if i == j:
-                h[i][j] = 1.0 - 2.0 * v[i] * v[j] / vv
-            else:
-                h[i][j] = -2.0 * v[i] * v[j] / vv
+            delta = 1.0 if i == j else 0.0
+            h[i][j] = delta - 2.0 * v[i] * v[j].conjugate() / vv
+
     return h
 
 def vector_norm(v):
-    return sqrt(sum(x * x for x in v))
+    return sqrt(sum(abs(x) ** 2 for x in v))
 
 
 def matrix_multiply(a, b):
@@ -44,6 +48,25 @@ def max_val_below_diagonal(matrix):
     
     return max_val
 
+def format_number(x, precision=6, eps=EPS):
+    if isinstance(x, complex):
+        real = 0.0 if abs(x.real) < eps else x.real
+        imag = 0.0 if abs(x.imag) < eps else x.imag
+
+        if imag == 0.0:
+            return f"{real:.{precision}f}"
+
+        if real == 0.0:
+            return f"{imag:.{precision}f}i"
+
+        sign = "+" if imag >= 0 else "-"
+        return f"{real:.{precision}f} {sign} {abs(imag):.{precision}f}i"
+
+    if abs(x) < eps:
+        x = 0.0
+
+    return f"{x:.{precision}f}"
+
 def print_matrix(matrix, name="Matrix", precision=6, eps=EPS):
     cleaned = []
     for row in matrix:
@@ -58,7 +81,7 @@ def print_matrix(matrix, name="Matrix", precision=6, eps=EPS):
     for row in cleaned:
         formatted_row = []
         for x in row:
-            formatted_row.append(f"{x:.{precision}f}")
+            formatted_row.append(format_number(x, precision, eps))
         formatted.append(formatted_row)
 
     width = max(len(item) for row in formatted for item in row)
@@ -73,32 +96,113 @@ def print_matrix(matrix, name="Matrix", precision=6, eps=EPS):
 def print_vector(vector, title, label="λ"):
     print(title)
     for i, value in enumerate(vector, start=1):
-        print(f"{label}{i}: {value:12.6f}")
+        print(f"{label}{i}: {format_number(value)}")
     print()
 
 def trace(matrix):
     return sum(matrix[i][i] for i in range(len(matrix)))
 
+def is_quasi_triangular(matrix, eps=EPS):
+    n = len(matrix)
 
-def determinant_3x3(matrix):
-    a11, a12, a13 = matrix[0]
-    a21, a22, a23 = matrix[1]
-    a31, a32, a33 = matrix[2]
+    for i in range(n):
+        for j in range(i-1):
+            if abs(matrix[i][j]) > eps:
+                return False
+    return True
 
-    return (
-        a11 * a22 * a33
-        + a12 * a23 * a31
-        + a13 * a21 * a32
-        - a13 * a22 * a31
-        - a11 * a23 * a32
-        - a12 * a21 * a33
-    )
+def eigenvalues_from_quasi_triangular(matrix, eps=EPS):
+    n = len(matrix)
+    values = []
 
-def check_solution(original_matrix, final_matrix, values, eps=1e-9):
+    i = 0
+    while i < n:
+        if i < n - 1 and abs(matrix[i+1][i]) > eps:
+            a11 = matrix[i][i]
+            a12 = matrix[i][i+1]
+            a21 = matrix[i+1][i]
+            a22 = matrix[i+1][i+1]
+
+            tr = a11 + a22
+            det = a11 * a22 - a12 * a21
+            disc = tr * tr - 4 * det
+
+            root  = sqrt(disc)
+            values.append((tr + root) / 2)
+            values.append((tr - root) / 2)
+
+            i += 2
+        else:
+            values.append(matrix[i][i])
+            i += 1
+    
+    return values
+
+
+def determinant(matrix):
+    """Вычисление определителя методом Гаусса. Работает для n x n и complex."""
+    n = len(matrix)
+    a = [row[:] for row in matrix]
+    det = 1 + 0j
+
+    for i in range(n):
+        pivot = i
+
+        for row in range(i + 1, n):
+            if abs(a[row][i]) > abs(a[pivot][i]):
+                pivot = row
+
+        if abs(a[pivot][i]) < EPS:
+            return 0.0
+
+        if pivot != i:
+            a[i], a[pivot] = a[pivot], a[i]
+            det *= -1
+
+        pivot_value = a[i][i]
+        det *= pivot_value
+
+        for row in range(i + 1, n):
+            factor = a[row][i] / pivot_value
+
+            for col in range(i + 1, n):
+                a[row][col] -= factor * a[i][col]
+
+    return det
+
+def check_solution(original_matrix, final_matrix, values, eps=1e-7):
     print("Проверка решения:")
 
-    if len(original_matrix) == 3:
-        max_below = max_val_below_diagonal(final_matrix)
-        print(f"Наибольшее значение под диагональю = {max_below:.10e}")
-        print()
+    original_trace = trace(original_matrix)
+    final_trace = trace(final_matrix)
+    eigen_trace = sum(values)
+
+    original_det = determinant(original_matrix)
+    eigen_det = prod(values, start=1 + 0j)
+
+
+    print(f"След исходной матрицы:              {format_number(original_trace)}")
+    print(f"След матрицы после QR-алгоритма:    {format_number(final_trace)}")
+    print(f"Сумма найденных собственных значений: {format_number(eigen_trace)}")
+    print()
+    trace_diff = abs(original_trace - eigen_trace)
+
+    print(f"|tr(A) - Σλ|: {trace_diff:.10e}")
+
+    if trace_diff < eps:
+        print("Проверка по следу: пройдена")
+    else:
+        print("Проверка по следу: не пройдена")
+
+    print()
+
+    print(f"Определитель исходной матрицы:      {format_number(original_det)}")
+    print(f"Произведение собственных значений:  {format_number(eigen_det)}")
+    print()
+
+    if is_quasi_triangular(final_matrix, eps):
+        print("Финальная матрица имеет верхнюю квазитреугольную форму: да")
+    else:
+        print("Финальная матрица имеет верхнюю квазитреугольную форму: нет")
+
     print()
