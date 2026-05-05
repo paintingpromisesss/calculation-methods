@@ -6,8 +6,11 @@ def simple_iteration(x0, a, b, eps=EPS, max_iter=1000):
     
     q = abs(dphi(a))
 
+    bad_q = False
+
     if q >= 1:
-        print("Метод простых итераций не гарантирует сходимость (q >= 1)")
+        print(f"Метод простых итераций не гарантирует сходимость: q = {q:.6f} >= 1")
+        bad_q = True
 
     x_prev = x0
 
@@ -15,10 +18,13 @@ def simple_iteration(x0, a, b, eps=EPS, max_iter=1000):
         x_next = phi(x_prev)
         diff = abs(x_next - x_prev)
 
-        error_estimate = q / (1 - q) * diff
-
-        if error_estimate <= eps:
-            return x_next, k
+        if bad_q:
+            if diff < eps:
+                return x_next, k
+        else:
+            error_estimate = q / (1 - q) * diff
+            if error_estimate <= eps:
+                return x_next, k
 
         x_prev = x_next
 
