@@ -140,7 +140,6 @@ def eigenvalues_from_quasi_triangular(matrix, eps=EPS):
 
 
 def determinant(matrix):
-    """Вычисление определителя методом Гаусса. Работает для n x n и complex."""
     n = len(matrix)
     a = [row[:] for row in matrix]
     det = 1 + 0j
