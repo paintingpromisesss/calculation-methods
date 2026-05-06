@@ -57,7 +57,7 @@ def newton_method(x0, eps=EPS, max_iter=1000):
 
 def main():
     x0 = 1.1
-    a, b = 1.1, 1.2
+    a, b = 1.0, 1.5
     root, iterations = simple_iteration(x0, a, b, max_iter=1000)
 
     print("Метод простых итераций:")
