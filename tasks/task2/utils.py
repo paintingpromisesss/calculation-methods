@@ -1,31 +1,34 @@
-from math import atan, sqrt, tan, cos
+from math import tan, cos
 EPS = 1e-12
+
+B11 = 0.21249177
+B12 = -0.36123602
+B21 = 0.36324400
+B22 = 0.38248519
 
 
 def phi1(x1, x2):
-    return atan(x2)
+    return x1 - (B11 * f1(x1, x2) + B12 * f2(x1, x2))
 
 
 def phi2(x1, x2):
-    value = 1 + x1 - 2 * x1**2
-    if value < 0:
-        raise ValueError(
-            "Значение под корнем отрицательное, метод простых итераций не применим")
-
-    return sqrt(value)
+    return x2 - (B21 * f1(x1, x2) + B22 * f2(x1, x2))
 
 
 def dphi1_dx1(x1, x2):
-    return 0
+    return 1 - (B11 * df1_dx1(x1, x2) + B12 * df2_dx1(x1, x2))
+
 
 def dphi1_dx2(x1, x2):
-    return 1 / (1 + x2**2)
+    return -(B11 * df1_dx2(x1, x2) + B12 * df2_dx2(x1, x2))
+
 
 def dphi2_dx1(x1, x2):
-    return (1 - 4 * x1) / (2 * sqrt(1 + x1 - 2 * x1**2))
+    return -(B21 * df1_dx1(x1, x2) + B22 * df2_dx1(x1, x2))
+
 
 def dphi2_dx2(x1, x2):
-    return 0
+    return 1 - (B21 * df1_dx2(x1, x2) + B22 * df2_dx2(x1, x2))
 
 
 def get_q(x1_min, x1_max, x2_min, x2_max, n=1000):

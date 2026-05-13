@@ -23,11 +23,11 @@ def simple_iteration(x1_0, x2_0, eps=EPS, max_iter=1000):
 
         if bad_q:
             if dx < eps:
-                return x1_next, x2_next, k
+                return x1_next, x2_next, q, k
         else:
             error_estimate = q / (1- q) * dx
             if error_estimate < eps:
-                return x1_next, x2_next, k
+                return x1_next, x2_next, q, k
 
         x1, x2 = x1_next, x2_next
     raise ValueError(
@@ -73,9 +73,10 @@ def newton_method(x1_0, x2_0, eps=EPS, max_iter=1000):
 def main():
     x1_0, x2_0 = 0.7, 0.85
 
-    x1, x2, iterations = simple_iteration(x1_0, x2_0, max_iter=1000)
+    x1, x2, q, iterations = simple_iteration(x1_0, x2_0, max_iter=1000)
 
     print("Метод простых итераций:")
+    print(f"q = {q:.6f}")
     print(f"Приближенное решение: x1 = {x1:.10f}, x2 = {x2:.10f}")
     print(f"Количество итераций: {iterations}")
     print("Проверка:")

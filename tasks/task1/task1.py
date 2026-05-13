@@ -18,7 +18,7 @@ def simple_iteration(a, b, eps=EPS, max_iter=1000):
 
         error_estimate = q / (1 - q) * diff
         if error_estimate <= eps:
-            return x_next, k
+            return x_next, q, k
 
         x_prev = x_next
 
@@ -52,10 +52,11 @@ def newton_method(a, b, eps=EPS, max_iter=1000):
 
 def main():
     a, b = 1.0, 1.5
-    root, iterations = simple_iteration(a, b, max_iter=1000)
+    root, q, iterations = simple_iteration(a, b, max_iter=1000)
 
     print("Метод простых итераций:")
     print(f"Приближенное решение: {root:.10f}")
+    print(f"q = {q:.6f}")
     print(f"Количество итераций: {iterations}")
     print("Проверка:")
     print(f"f({root:.10f}) = {f(root):.10f}")
