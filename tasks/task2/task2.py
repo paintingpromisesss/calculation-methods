@@ -9,11 +9,8 @@ def simple_iteration(x1_0, x2_0, eps=EPS, max_iter=1000):
 
     q = get_q(x1 - 0.1, x1 + 0.1, x2 - 0.1, x2 + 0.1)
 
-    bad_q = False
-
     if q >= 1:
-        print(f"Метод простых итераций не гарантирует сходимость: q = {q:.6f} >= 1")
-        bad_q = True
+        raise ValueError(f"Метод простых итераций не гарантирует сходимость: q = {q:.6f} >= 1")
 
     for k in range(1, max_iter + 1):
         x1_next = phi1(x1, x2)
@@ -21,13 +18,9 @@ def simple_iteration(x1_0, x2_0, eps=EPS, max_iter=1000):
 
         dx = max(abs(x1_next - x1), abs(x2_next - x2))
 
-        if bad_q:
-            if dx < eps:
-                return x1_next, x2_next, q, k
-        else:
-            error_estimate = q / (1- q) * dx
-            if error_estimate < eps:
-                return x1_next, x2_next, q, k
+        error_estimate = q / (1- q) * dx
+        if error_estimate < eps:
+            return x1_next, x2_next, q, k
 
         x1, x2 = x1_next, x2_next
     raise ValueError(

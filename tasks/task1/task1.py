@@ -5,7 +5,7 @@ def simple_iteration(a, b, eps=EPS, max_iter=1000):
     if eps <= 0:
         raise ValueError("Эпсилон должен быть положительным")
     
-    q = abs(dphi(a))
+    q = max(abs(dphi(x)) for x in [a, b])
 
     if q >= 1:
         raise ValueError(f"Метод простых итераций не гарантирует сходимость: q = {q:.6f} >= 1")
