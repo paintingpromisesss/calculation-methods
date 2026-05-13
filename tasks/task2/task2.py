@@ -9,7 +9,8 @@ from utils import (
     print_c_system,
     print_coefficients_table,
     print_spline_polynomials,
-    check_solution
+    check_solution,
+    build_plot
 )
 
 
@@ -153,6 +154,8 @@ def solve_case(x_values, y_values, x_star):
 
     print("Проверка:")
     check_solution(x_values, y_values, a_values, b_values, c_values, d_values)
+    build_plot(x_values, y_values, a_values, b_values,
+               c_values, d_values, x_star)
     print("-" * 50)
 
 

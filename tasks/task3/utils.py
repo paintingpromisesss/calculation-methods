@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
+import os
+
 EPS = 1e-12
+
+
+def get_plot_path(file_name):
+    return os.path.join(os.path.dirname(__file__), file_name)
 
 def validate_values(x_values, y_values):
     if len(x_values) != len(y_values):
@@ -250,4 +256,4 @@ def build_plot(x_values, y_values, linear_coefficients, quadratic_coefficients):
     plt.ylabel("y")
     plt.grid(True)
     plt.legend()
-    # plt.savefig("task3_plot.png", dpi=300)
+    # plt.savefig(get_plot_path("task3_plot.png"), dpi=300)

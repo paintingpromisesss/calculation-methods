@@ -1,4 +1,15 @@
-from utils import EPS, lagrange_basis, calculate_y_values, print_values_table, f, absolute_error, print_divided_differences_table, print_polynomial_coefficients, check_solution
+from utils import (
+    EPS,
+    lagrange_basis,
+    calculate_y_values,
+    print_values_table,
+    f,
+    absolute_error,
+    print_divided_differences_table,
+    print_polynomial_coefficients,
+    check_solution,
+    build_plot
+)
 
 def lagrange_polynomial(x, x_values, y_values):
     if len(x_values) != len(y_values):
@@ -82,6 +93,7 @@ def solve_case(case_name, x_values, x_star):
 
     print("Проверка совпадения значений:")
     check_solution(x_star, lagrange_value, newton_value)
+    build_plot(case_name, x_values, y_values, table, x_star)
     print("-" * 50)
 
 def main():

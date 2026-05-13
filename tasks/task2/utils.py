@@ -1,4 +1,11 @@
+import os
+import matplotlib.pyplot as plt
+
 EPS = 1e-12
+
+
+def get_plot_path(file_name):
+    return os.path.join(os.path.dirname(__file__), file_name)
 
 
 def validate_values(x_values, y_values):
@@ -160,3 +167,48 @@ def check_solution(x_values, y_values, a_values, b_values, c_values, d_values):
 
         print(f"|S{i + 1}({right_x:.10f}) - f{i + 1}| = "
               f"{abs(right_value - y_values[i + 1]):.10f}")
+
+
+def calculate_spline_value(x, x_values, a_values, b_values, c_values, d_values):
+    segment = find_segment(x, x_values)
+    dx = x - x_values[segment]
+
+    return (a_values[segment] +
+            b_values[segment] * dx +
+            c_values[segment] * dx ** 2 +
+            d_values[segment] * dx ** 3)
+
+
+def build_plot(x_values, y_values, a_values, b_values, c_values, d_values, x_star):
+    left = min(x_values)
+    right = max(x_values)
+    points_count = 200
+    step = (right - left) / (points_count - 1)
+
+    x_plot = []
+    y_spline = []
+
+    for i in range(points_count):
+        x = left + step * i
+
+        x_plot.append(x)
+        y_spline.append(calculate_spline_value(
+            x, x_values, a_values, b_values, c_values, d_values))
+
+    y_star = calculate_spline_value(
+        x_star, x_values, a_values, b_values, c_values, d_values)
+
+    file_name = get_plot_path("task2_plot.png")
+
+    plt.figure()
+    plt.scatter(x_values, y_values, label="Табличные значения", zorder=3)
+    plt.scatter([x_star], [y_star], label="X*", zorder=4)
+    plt.plot(x_plot, y_spline, label="S(x)")
+
+    plt.title("Задание 3.2")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(file_name, dpi=300, bbox_inches="tight")
+    plt.close()
