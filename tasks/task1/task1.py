@@ -138,19 +138,6 @@ def main():
     y0 = 3.0
     z0 = 2.0
 
-    print("x^2 * y'' + x * y' - y - 3x^2 = 0")
-    print(f"y({a:.1f}) = {y0:.1f}")
-    print(f"y'({a:.1f}) = {z0:.1f}")
-    print(f"x принадлежит [{a:.1f}, {b:.1f}], h = {h:.1f}")
-    print("Точное решение:")
-    print("y = x^2 + x + 1 / x")
-    print()
-
-    print("После замены z = y' получаем систему:")
-    print("y' = z")
-    print("z' = (-x * z + y + 3x^2) / x^2")
-    print()
-
     euler_points = euler_method(a, b, h, y0, z0)
     runge_kutta_points = runge_kutta_method(a, b, h, y0, z0)
     adams_points = adams_method(a, b, h, y0, z0)
