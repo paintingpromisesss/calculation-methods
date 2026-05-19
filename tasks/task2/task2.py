@@ -1,20 +1,22 @@
-from utils import get_q, phi1, phi2, f1, f2, df1_dx1, df1_dx2, df2_dx1, df2_dx2, EPS
+from utils import get_q, phi1, phi2, f1, f2, df1_dx1, df1_dx2, df2_dx1, df2_dx2, get_x0, get_B, EPS
 
 
-def simple_iteration(x1_0, x2_0, eps=EPS, max_iter=1000):
+def simple_iteration(x1_min, x1_max, x2_min, x2_max, eps=EPS, max_iter=1000):
     if eps <= 0:
         raise ValueError("Эпсилон должен быть положительным")
 
-    x1, x2 = x1_0, x2_0
+    x1, x2 = get_x0(x1_min, x1_max, x2_min, x2_max)
 
-    q = get_q(x1 - 0.1, x1 + 0.1, x2 - 0.1, x2 + 0.1)
+    B = get_B(x1, x2)
+
+    q = get_q(x1_min, x1_max, x2_min, x2_max, B)
 
     if q >= 1:
         raise ValueError(f"Метод простых итераций не гарантирует сходимость: q = {q:.6f} >= 1")
 
     for k in range(1, max_iter + 1):
-        x1_next = phi1(x1, x2)
-        x2_next = phi2(x1, x2)
+        x1_next = phi1(x1, x2, B)
+        x2_next = phi2(x1, x2, B)
 
         dx = max(abs(x1_next - x1), abs(x2_next - x2))
 
@@ -27,11 +29,11 @@ def simple_iteration(x1_0, x2_0, eps=EPS, max_iter=1000):
         "Метод простых итераций не сошелся за максимальное количество итераций")
 
 
-def newton_method(x1_0, x2_0, eps=EPS, max_iter=1000):
+def newton_method(x1_min, x1_max, x2_min, x2_max, eps=EPS, max_iter=1000):
     if eps <= 0:
         raise ValueError("Эпсилон должен быть положительным")
 
-    x1, x2 = x1_0, x2_0
+    x1, x2 = get_x0(x1_min, x1_max, x2_min, x2_max)
 
     for k in range(1, max_iter + 1):
         a11 = df1_dx1(x1, x2)
@@ -64,9 +66,9 @@ def newton_method(x1_0, x2_0, eps=EPS, max_iter=1000):
 
 
 def main():
-    x1_0, x2_0 = 0.7, 0.85
+    x1_min, x1_max, x2_min, x2_max = 0.6, 0.8, 0.75, 0.95
 
-    x1, x2, q, iterations = simple_iteration(x1_0, x2_0, max_iter=1000)
+    x1, x2, q, iterations = simple_iteration(x1_min, x1_max, x2_min, x2_max, max_iter=1000)
 
     print("Метод простых итераций:")
     print(f"q = {q:.6f}")
@@ -77,7 +79,7 @@ def main():
     print(f"f2({x1:.10f}, {x2:.10f}) = {f2(x1, x2):.10f}")
     print()
 
-    x1, x2, iterations = newton_method(x1_0, x2_0, max_iter=1000)
+    x1, x2, iterations = newton_method(x1_min, x1_max, x2_min, x2_max, max_iter=1000)
     print("Метод Ньютона:")
     print(f"Приближенное решение: x1 = {x1:.10f}, x2 = {x2:.10f}")
     print(f"Количество итераций: {iterations}")
