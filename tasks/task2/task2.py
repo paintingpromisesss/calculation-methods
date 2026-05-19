@@ -55,12 +55,12 @@ def calculate_c_values(x_values, y_values):
 
 
 def calculate_a_values(y_values):
-    # ai = f(xi-1)
+    # ai = f(xi-1), т.к. сплайн обязан проходить через левую точку.
     return [y_values[i] for i in range(len(y_values) - 1)]
 
 
 def calculate_b_values(x_values, y_values, c_values):
-    # bi - начальный наклон i-го сплайна
+    # bi - начальный наклон i-го сплайна, который учитывает, что кривая должна гладко склеиваться с соседними.
     h_values = calculate_h_values(x_values)
     n = len(x_values) - 1
     b_values = []
@@ -86,6 +86,7 @@ def calculate_d_values(x_values, c_values):
     d_values = []
 
     for i in range(n - 1):
+        # формула берётся из условия совпадения производной на стыках.
         d = (c_values[i + 1] - c_values[i]) / (3 * h_values[i])
         d_values.append(d)
 

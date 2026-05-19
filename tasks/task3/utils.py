@@ -47,6 +47,7 @@ def calculate_sums(x_values, y_values):
 
 def build_linear_system(sums):
     # F1(x) = a0 + a1*x
+    
     # a0*N + a1*sum(xi) = sum(yi)
     # a0*sum(xi) + a1*sum(xi^2) = sum(xi*yi)
     matrix = [

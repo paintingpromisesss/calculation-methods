@@ -58,7 +58,7 @@ def solve_case(x_values, y_values, x_star):
     print_selected_points(x_values, y_values, point_index)
     print()
 
-    print("Производные по формулам методички:")
+    print("Производные:")
     print_derivative_parts(
         result["left_derivative"],
         result["right_derivative"],
