@@ -73,9 +73,9 @@ def main():
     print()
 
     x0_newton = 0.4663
+    print("Метод Ньютона с неверным начальным приближением:")
     root, iterations = newton_method(a, b, max_iter=1000, x0=x0_newton)
 
-    print("Метод Ньютона с неверным начальным приближением:")
     print(f"Начальное приближение: x0 = {x0_newton:.4f}")
     print(f"Приближенное решение: {root:.10f}")
     print(f"Количество итераций: {iterations}")
