@@ -3,8 +3,8 @@ EPS = 1e-12
 
 
 def phi(x):
-    if x <= -2:
-        raise ValueError("x должен быть больше -2")
+    #if x <= -2:
+    #    raise ValueError("x должен быть больше -2")
     value = log(x+2) + 0.5
 
     if value < 0:
@@ -14,8 +14,8 @@ def phi(x):
 
 
 def dphi(x):
-    if x <= -2:
-        raise ValueError("x должен быть больше -2")
+    #if x <= -2:
+    #    raise ValueError("x должен быть больше -2")
     value = log(x+2) + 0.5
 
     if value < 0:
@@ -25,19 +25,19 @@ def dphi(x):
 
 
 def f(x):
-    if x <= -2:
-        raise ValueError("x должен быть больше -2")
+    #if x <= -2:
+    #    raise ValueError("x должен быть больше -2")
     return log(x+2) - x**4 + 0.5
 
 
 def df(x):
-    if x <= -2:
-        raise ValueError("x должен быть больше -2")
+    #if x <= -2:
+    #    raise ValueError("x должен быть больше -2")
     return 1/(x+2) - 4*x**3
 
 def ddf(x):
-    if x <= -2:
-        raise ValueError("x должен быть больше -2")
+    #if x <= -2:
+    #    raise ValueError("x должен быть больше -2")
     return -1/(x+2)**2 - 12*x**2
 
 def get_x0_newton(a, b):
@@ -52,7 +52,8 @@ def get_x0_newton(a, b):
     elif fb * ddf_b > 0:
         return b
     else:
-        raise ValueError("Невозможно выбрать начальное приближение для метода Ньютона")
+        print("Приближение не удовлетворяет f(x)f''(x)>0")
+        return a
     
 def get_x0_simple_iteration(a, b):
     return (a + b) / 2
