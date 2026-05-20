@@ -41,7 +41,7 @@ def build_c_system(x_values, y_values):
 
     return matrix, right_side
 
-
+# Переделать на прогонку !!!
 def calculate_c_values(x_values, y_values):
     matrix, right_side = build_c_system(x_values, y_values)
 
