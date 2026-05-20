@@ -38,46 +38,50 @@ def calculate_h_values(x_values):
 def solve_linear_system(matrix, right_side, eps=EPS):
     n = len(right_side)
 
-    a = [row[:] for row in matrix]
-    b = right_side[:]
+    a = [0.0] * n
+    b = [0.0] * n
+    c = [0.0] * n
+    d = right_side[:]
 
-    # Прямой ход метода Гаусса
     for i in range(n):
-        max_row = i
+        b[i] = matrix[i][i]
 
-        for j in range(i + 1, n):
-            if abs(a[j][i]) > abs(a[max_row][i]):
-                max_row = j
+        if i > 0:
+            a[i] = matrix[i][i - 1]
 
-        if abs(a[max_row][i]) < eps:
-            raise ValueError("Система не имеет единственного решения")
+        if i < n - 1:
+            c[i] = matrix[i][i + 1]
 
-        a[i], a[max_row] = a[max_row], a[i]
-        b[i], b[max_row] = b[max_row], b[i]
+    p = [0.0] * n
+    q = [0.0] * n
 
-        for j in range(i + 1, n):
-            factor = a[j][i] / a[i][i]
+    if abs(b[0]) < eps:
+        raise ValueError("Нулевой ведущий элемент в методе прогонки")
+    
+    p[0] = -c[0] / b[0]
+    q[0] = d[0] / b[0]
 
-            for k in range(i, n):
-                a[j][k] -= factor * a[i][k]
+    for i in range(1, n - 1):
+        denom = a[i] * p[i-1] + b[i]
+        if abs(denom) < EPS:
+            raise ValueError(f"Нулевой знаменатель на шаге {i}")
+        p[i] = -c[i] / denom
+        q[i] = (d[i] - a[i] * q[i-1]) / denom
 
-            b[j] -= factor * b[i]
+    p[n-1] = 0.0
+    denom = a[n-1] * p[n-2] + b[n-1]
+    if abs(denom) < EPS:
+        raise ValueError("Нулевой знаменатель на последнем шаге")
+    q[n-1] = (d[n-1] - a[n-1] * q[n-2]) / denom
 
-    # Обратный ход метода Гаусса
-    solution = [0 for _ in range(n)]
+    x = [0.0] * n
+    x[n-1] = q[n-1]
 
-    for i in range(n - 1, -1, -1):
-        value = b[i]
+    for i in range(n-2, -1, -1):
+        x[i] = p[i] * x[i+1] + q[i]
+    
+    return x
 
-        for j in range(i + 1, n):
-            value -= a[i][j] * solution[j]
-
-        if abs(a[i][i]) < eps:
-            raise ValueError("Система не имеет единственного решения")
-
-        solution[i] = value / a[i][i]
-
-    return solution
 
 def find_segment(x, x_values):
     if x < x_values[0] - EPS or x > x_values[-1] + EPS:

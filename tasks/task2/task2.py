@@ -41,11 +41,9 @@ def build_c_system(x_values, y_values):
 
     return matrix, right_side
 
-# Переделать на прогонку !!!
 def calculate_c_values(x_values, y_values):
     matrix, right_side = build_c_system(x_values, y_values)
 
-    # Решение системы A * c = b
     solution = solve_linear_system(matrix, right_side)
 
     # Сплайн имеет нулевую кривизну на левом конце, поэтому c1 = 0
