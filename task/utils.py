@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 
 EPS = 1e-12
 
-# Физические параметры задачи:
-# A_COEF = 1.0 — нормированный коэффициент температуропроводности (диффузии).
-# T = 0.1 — конечное время; выбрано с учетом экспоненты exp(-4*pi^2*a*t) ~= exp(-3.95) ~= 0.02,
-# чтобы решение успело наглядно затухнуть (~ в 50 раз), но не обратилось в машинный ноль.
 A_COEF = 1.0
 L = 1.0
 T = 0.1
@@ -18,7 +14,6 @@ def get_plot_path(file_name):
 
 
 def exact_solution(x, t, a=A_COEF):
-    # Аналитическое решение одномерного уравнения теплопроводности для Варианта 1:
     # U(x, t) = exp(-4 * pi^2 * a * t) * sin(2 * pi * x)
     return math.exp(-4.0 * (math.pi**2) * a * t) * math.sin(2.0 * math.pi * x)
 
@@ -34,31 +29,25 @@ def initial_grid(n, k_total, a=A_COEF, t_max=T):
     x_values = [j * h for j in range(n + 1)]
     t_values = [k * tau for k in range(k_total + 1)]
 
-    # Начальное распределение температуры при t = 0: u(x, 0) = sin(2*pi*x)
     u_0 = [math.sin(2.0 * math.pi * x) for x in x_values]
 
     # Граничные условия Дирихле (1-го рода): на концах отрезка строгие нули
     u_0[0] = 0.0
     u_0[n] = 0.0
 
-    return x_values, t_values, u_0, h, tau, sigma
+    return x_values, t_values, u_0, sigma
 
 
 def tridiagonal_solve(lower, middle, upper, right):
-    """
-    Метод прогонки (алгоритм Томаса) для решения трехдиагональной СЛАУ A*u = d.
-    Условие применимости (диагональное преобладание): |middle_i| >= |lower_i| + |upper_i|.
-    В наших весовых схемах оно выполняется строго, деление на ноль исключено.
-    """
     m = len(middle)
-    p = [0.0] * m  # Прогоночные коэффициенты alpha
-    q = [0.0] * m  # Прогоночные коэффициенты beta
+    p = [0.0] * m
+    q = [0.0] * m
     res = [0.0] * m
 
     if abs(middle[0]) < EPS:
         raise ValueError("Деление на ноль на первом шаге прогонки")
 
-    # Прямой ход прогонки: расчет прогоночных коэффициентов
+    # Прямой ход
     p[0] = -upper[0] / middle[0]
     q[0] = right[0] / middle[0]
 
@@ -69,7 +58,7 @@ def tridiagonal_solve(lower, middle, upper, right):
         p[i] = -upper[i] / denom if i < m - 1 else 0.0
         q[i] = (right[i] - lower[i] * q[i - 1]) / denom
 
-    # Обратный ход прогонки: восстановление решения u_i = p_i * u_{i+1} + q_i
+    # Обратный ход
     res[m - 1] = q[m - 1]
     for i in range(m - 2, -1, -1):
         res[i] = p[i] * res[i + 1] + q[i]
