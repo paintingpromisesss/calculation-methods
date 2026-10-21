@@ -160,36 +160,41 @@ def build_plots(solutions, x_values, t_values, a=A_COEF):
     plt.close()
 
 
-def run_grid_convergence_study(schemes):
-    _, axes = plt.subplots(1, 2, figsize=(12, 4.5), num="Исследование сходимости")
 
-    # Совместное измельчение h и tau, число Куранта примерно 0.5
+def run_grid_convergence_study(schemes):
+    fig, axes = plt.subplots(
+        1, 2,
+        figsize=(12, 4.5),
+        num="Исследование сходимости"
+    )
+
+    # 1. Измельчение h при фиксированном tau
     n_list = [10, 20, 40, 80]
-    nu_fixed = 0.5
+    k_fixed = 100
+    tau_fixed = T / k_fixed
+
     h_vals = [L / n for n in n_list]
     err_h = {name: [] for name, _ in schemes}
 
     for n in n_list:
-        h = L / n
-        tau = nu_fixed * h / A_COEF
-        k = round(T / tau)
         for name, solver in schemes:
-            x, t, layers, _ = solver(n=n, k_total=k)
+            x, t, layers, _ = solver(n=n, k_total=k_fixed)
             max_err, _ = compute_errors(layers, x, t)
             err_h[name].append(max_err)
 
     for name, _ in schemes:
         axes[0].loglog(h_vals, err_h[name], marker="o", label=name)
 
-    axes[0].set_title("Совместное измельчение h и tau")
-    axes[0].set_xlabel("h = pi/N (tau ≈ 0.5 h/a)")
-    axes[0].set_ylabel("max |ошибка| при T")
+    axes[0].set_title("Измельчение шага по пространству")
+    axes[0].set_xlabel(f"h = pi/N (tau = {tau_fixed:.3f})")
+    axes[0].set_ylabel(f"max |ошибка| при T = {T:g}")
     axes[0].grid(True, which="both")
     axes[0].legend()
 
-    # Измельчение tau при фиксированном h
+    # 2. Измельчение tau при фиксированном h
     n_fixed = 40
     k_list = [50, 100, 200, 400]
+
     tau_vals = [T / k for k in k_list]
     err_tau = {name: [] for name, _ in schemes}
 
@@ -204,13 +209,13 @@ def run_grid_convergence_study(schemes):
 
     axes[1].set_title("Измельчение шага по времени")
     axes[1].set_xlabel(f"tau = T/K (h = pi/{n_fixed})")
-    axes[1].set_ylabel("max |ошибка| при T")
+    axes[1].set_ylabel(f"max |ошибка| при T = {T:g}")
     axes[1].grid(True, which="both")
     axes[1].legend()
 
-    plt.tight_layout()
-    plt.savefig(get_plot_path("plot_convergence.png"), dpi=300)
-    plt.close()
+    fig.tight_layout()
+    fig.savefig(get_plot_path("plot_convergence.png"), dpi=300)
+    plt.close(fig)
 
 def exact_first_legend(ax, **kwargs):
     handles, labels = ax.get_legend_handles_labels()
