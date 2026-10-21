@@ -49,14 +49,13 @@ def solve_explicit(n=40, k_total=100, a=A_COEF, t_max=T, init_order=2):
     return x_values, t_values, layers, sigma
 
 
-# Неявная схема: безусловно устойчива, первый порядок по времени
+# Неявная схема: безусловно устойчива
 def solve_implicit(n=40, k_total=100, a=A_COEF, t_max=T, init_order=2):
     x_values, t_values, u_0, u_1, _, tau, sigma = initial_grid(
         n, k_total, a, t_max, init_order=init_order
     )
     m = n - 1
 
-    # Коэффициенты трехдиагональной матрицы на новом слое
     lower = [-sigma] * m
     middle = [1.0 + 2.0 * sigma] * m
     upper = [-sigma] * m
@@ -72,7 +71,6 @@ def solve_implicit(n=40, k_total=100, a=A_COEF, t_max=T, init_order=2):
 
         right = [2.0 * u_cur[j] - u_prev[j] for j in range(1, n)]
 
-        # Перенос граничных значений в правую часть
         right[0] += sigma * u_next_0
         right[-1] += sigma * u_next_n
 
@@ -134,6 +132,7 @@ def main():
             k = round(fraction * k_total)
             max_err, rmse = compute_errors([layers[k]], x_base, [t_base[k]])
             print(f"{name:<24}{t_base[k]:<10.4f}{max_err:<18.6e}{rmse:.6e}")
+        print()
 
     build_plots(solutions, x_base, t_base)
 

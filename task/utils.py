@@ -24,7 +24,7 @@ def initial_grid(n, k_total, a=A_COEF, t_max=T, init_order=2):
 
     h = L / n
     tau = t_max / k_total
-    sigma = (a * tau / h) ** 2  # Квадрат числа Куранта
+    sigma = (a * tau / h) ** 2
 
     x_values = [j * h for j in range(n + 1)]
     t_values = [k * tau for k in range(k_total + 1)]
