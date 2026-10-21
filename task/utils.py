@@ -120,7 +120,7 @@ def build_plots(solutions, x_values, t_values, a=A_COEF):
     axes1[0].set_xlabel("x")
     axes1[0].set_ylabel("u(x, T)")
     axes1[0].grid(True)
-    axes1[0].legend()
+    exact_first_legend(axes1[0])
 
     exact_t = [exact_solution(x_fixed, t, a) for t in t_values]
     axes1[1].plot(t_values, exact_t, "k--", label="Точное")
@@ -128,14 +128,14 @@ def build_plots(solutions, x_values, t_values, a=A_COEF):
     axes1[1].set_xlabel("t")
     axes1[1].set_ylabel(f"u(x = {x_fixed:.3f}, t)")
     axes1[1].grid(True)
-    axes1[1].legend()
+    exact_first_legend(axes1[1])
 
     plt.tight_layout()
     plt.savefig(get_plot_path("plot_compare.png"), dpi=300, bbox_inches="tight")
     plt.close()
 
     # Профили волны в разные моменты времени
-    indices = [round(fraction * (len(t_values) - 1)) for fraction in (0.0, 0.25, 0.5, 1.0)]
+    indices = [round(fraction * (len(t_values) - 1)) for fraction in (0.0, 0.25, 0.5, 0.75, 1.0)]
     fig2, axes2 = plt.subplots(2, 2, num="Профили волны (2х2)", figsize=(11, 8), sharey=True)
 
     for (title, layers), ax in zip(solutions.items(), axes2.flat):
@@ -152,7 +152,7 @@ def build_plots(solutions, x_values, t_values, a=A_COEF):
         ax.set_ylabel("u(x, t)")
         ax.set_ylim(-1.2, 1.2)
         ax.grid(True)
-        ax.legend(loc="upper right")
+        exact_first_legend(ax, loc="upper right")
 
     fig2.suptitle("Цветные линии — численное решение, чёрный пунктир — точное")
     plt.tight_layout()
@@ -211,3 +211,15 @@ def run_grid_convergence_study(schemes):
     plt.tight_layout()
     plt.savefig(get_plot_path("plot_convergence.png"), dpi=300)
     plt.close()
+
+def exact_first_legend(ax, **kwargs):
+    handles, labels = ax.get_legend_handles_labels()
+    order = sorted(
+        range(len(labels)),
+        key=lambda i: 0 if labels[i].startswith("Точное") else 1
+    )
+    ax.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        **kwargs
+    )

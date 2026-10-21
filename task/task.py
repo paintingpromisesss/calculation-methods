@@ -98,10 +98,11 @@ def main():
     k_total = 100
 
     schemes = [
-        ("Явная (крест)", solve_explicit),
-        ("Неявная", solve_implicit),
         ("Явная (1-й пор. НУ)", solve_explicit_order1),
         ("Неявная (1-й пор. НУ)", solve_implicit_order1),
+        ("Явная (2-й пор. НУ)", solve_explicit),
+        ("Неявная (2-й пор. НУ)", solve_implicit),
+
     ]
 
     h = L / n
@@ -109,7 +110,7 @@ def main():
     sigma = (A_COEF * tau / h) ** 2
 
     print(f"Базовый расчет: N={n}, K={k_total}, h={h:.5f}, tau={tau:.6f}, sigma={sigma:.4f}")
-    print(f"{'Метод':<24}{'max|ошибка| при T':<24}{'RMSE'}")
+    print(f"{'Метод':<24}{f'max|ошибка| при T={T:g}':<24}{'RMSE (0..T)'}")
 
     solutions = {}
     x_base = None
@@ -125,14 +126,50 @@ def main():
 
     assert x_base is not None and t_base is not None, "Не выбраны схемы для расчета"
 
-    print("\nПогрешности в разные моменты времени (RMSE по узлам одного слоя)")
-    print(f"{'Метод':<24}{'t':<10}{'max|ошибка|':<18}{'RMSE'}")
-    for name, layers in solutions.items():
-        for fraction in (0.0, 0.25, 0.5, 1.0):
-            k = round(fraction * k_total)
-            max_err, rmse = compute_errors([layers[k]], x_base, [t_base[k]])
-            print(f"{name:<24}{t_base[k]:<10.4f}{max_err:<18.6e}{rmse:.6e}")
+    method_order = [
+        "Явная (1-й пор. НУ)",
+        "Явная (2-й пор. НУ)",
+        "Неявная (1-й пор. НУ)",
+        "Неявная (2-й пор. НУ)",
+    ]
+
+    method_labels = [
+        "Явная НУ-1",
+        "Явная НУ-2",
+        "Неявная НУ-1",
+        "Неявная НУ-2",
+    ]
+
+    time_points = (0.0, 0.25, 0.5, 0.75, 1.0)
+
+    for metric_name, metric_idx in [
+        ("Максимальная абсолютная погрешность", 0),
+        ("Среднеквадратичная погрешность (RMSE)", 1),
+    ]:
+        print(f"\n{metric_name}")
+        print("-" * 85)
+
+        print(f"{'t':<10}", end="")
+        for label in method_labels:
+            print(f"{label:>18}", end="")
         print()
+
+        print("-" * 85)
+
+        for fraction in time_points:
+            k = round(fraction * k_total)
+            t = t_base[k]
+
+            print(f"{t:<10.2f}", end="")
+
+            for name in method_order:
+                layers = solutions[name]
+                errors = compute_errors(
+                    [layers[k]], x_base, [t]
+                )
+                print(f"{errors[metric_idx]:>18.3e}", end="")
+
+            print()
 
     build_plots(solutions, x_base, t_base)
 
