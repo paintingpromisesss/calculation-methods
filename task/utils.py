@@ -223,3 +223,54 @@ def exact_first_legend(ax, **kwargs):
         [labels[i] for i in order],
         **kwargs
     )
+
+def plot_error_over_time(solutions, x_values, t_values, a=A_COEF):
+    fig, axes = plt.subplots(
+        1, 2,
+        figsize=(14, 5),
+        num="Погрешность в зависимости от времени"
+    )
+
+    for name, layers in solutions.items():
+        max_errors = []
+        rmse_errors = []
+
+        for k, t in enumerate(t_values):
+            errors = [
+                layers[k][j] - exact_solution(x, t, a)
+                for j, x in enumerate(x_values)
+            ]
+
+            max_errors.append(max(abs(e) for e in errors))
+            rmse_errors.append(
+                math.sqrt(sum(e**2 for e in errors) / len(errors))
+            )
+
+        axes[0].plot(t_values, max_errors, linewidth=2, label=name)
+        axes[1].plot(t_values, rmse_errors, linewidth=2, label=name)
+
+    axes[0].set_title("Максимальная абсолютная погрешность")
+    axes[0].set_ylabel("max |u(x,t) - U(x,t)|")
+
+    axes[1].set_title("Среднеквадратичная погрешность")
+    axes[1].set_ylabel("RMSE")
+
+    for ax in axes:
+        ax.set_xlabel("Время t")
+        ax.set_xlim(t_values[0], t_values[-1])
+        ax.set_ylim(bottom=0)
+        ax.grid(True, alpha=0.4)
+        ax.legend(loc="upper left")
+
+    fig.suptitle(
+        "Зависимость погрешности численного решения от времени",
+        fontsize=14
+    )
+
+    plt.tight_layout()
+    plt.savefig(
+        get_plot_path("plot_error_over_time.png"),
+        dpi=300,
+        bbox_inches="tight"
+    )
+    plt.close()

@@ -8,6 +8,7 @@ from utils import (
     compute_errors,
     build_plots,
     run_grid_convergence_study,
+    plot_error_over_time
 )
 
 
@@ -172,6 +173,7 @@ def main():
             print()
 
     build_plots(solutions, x_base, t_base)
+    plot_error_over_time(solutions, x_base, t_base)
 
     run_grid_convergence_study(schemes)
 
